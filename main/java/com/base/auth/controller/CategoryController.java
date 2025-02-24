@@ -34,7 +34,7 @@ public class CategoryController extends ABasicController {
   private CategoryMapper categoryMapper;
 
   @PostMapping(value = "/create", produces= MediaType.APPLICATION_JSON_VALUE)
-  @PreAuthorize("hasRole('S_C')")
+  @PreAuthorize("hasRole('CA_C')")
   public ApiMessageDto<String> create(@Valid @RequestBody CreateCategoryForm request, BindingResult bindingResult){
     ApiMessageDto<String> apiMessageDto = new ApiMessageDto<>();
     Category category = categoryRepository.findFirstByName(request.getName());
@@ -51,8 +51,8 @@ public class CategoryController extends ABasicController {
   }
 
   @GetMapping(value = "/list", produces= MediaType.APPLICATION_JSON_VALUE)
-  @PreAuthorize("hasRole('S_L')")
-  public ApiMessageDto< ResponseListDto<List<CategoryDto>>> getList(CategoryCriteria request, Pageable pageable){
+  @PreAuthorize("hasRole('CA_L')")
+  public ApiMessageDto<ResponseListDto<List<CategoryDto>>> getList(CategoryCriteria request, Pageable pageable){
     ApiMessageDto< ResponseListDto<List<CategoryDto>>> apiMessageDto = new ApiMessageDto<>();
     Page<Category> categories = categoryRepository.findAll(request.getSpecification(), pageable);
     List<CategoryDto> response = categoryMapper.fromCategoryToComplteDtoList(categories.getContent());
@@ -64,7 +64,7 @@ public class CategoryController extends ABasicController {
   }
 
   @GetMapping(value = "/get/{id}", produces= MediaType.APPLICATION_JSON_VALUE)
-  @PreAuthorize("hasRole('S_V')")
+  @PreAuthorize("hasRole('CA_V')")
   public ApiMessageDto<CategoryDto> getCategoryById(@PathVariable("id") Long id){
     Category category = categoryRepository.findById(id).orElseThrow(() ->
         new NotFoundException("Category id not found"));
@@ -75,7 +75,7 @@ public class CategoryController extends ABasicController {
   }
 
   @PutMapping(value = "/update", produces= MediaType.APPLICATION_JSON_VALUE)
-  @PreAuthorize("hasRole('S_U')")
+  @PreAuthorize("hasRole('CA_U')")
   public ApiMessageDto<String> update(@Valid @RequestBody UpdateCategoryForm request, BindingResult bindingResult){
     ApiMessageDto<String> apiMessageDto = new ApiMessageDto<>();
     Category category = categoryRepository.findById(request.getCategoryId()).orElseThrow(() ->
@@ -95,7 +95,7 @@ public class CategoryController extends ABasicController {
   }
 
   @DeleteMapping(value = "/delete/{id}", produces= MediaType.APPLICATION_JSON_VALUE)
-  @PreAuthorize("hasRole('S_D')")
+  @PreAuthorize("hasRole('CA_D')")
   public ApiMessageDto<String> deleteCategory(@PathVariable("id") Long id){
     ApiMessageDto<String> apiMessageDto = new ApiMessageDto<>();
     Category category = categoryRepository.findById(id).orElseThrow(() ->

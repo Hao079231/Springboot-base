@@ -17,9 +17,13 @@ public class UserBaseConstant {
     public static final Integer STATUS_LOCK = -1;
     public static final Integer STATUS_DELETE = -2;
 
-    public static final Integer NATION_KIND_PROVINCE = 1;
-    public static final Integer NATION_KIND_DISTRICT = 2;
-    public static final Integer NATION_KIND_COMMUNE = 3;
+    public static final Integer NATION_TYPE_PROVINCE = 0;
+    public static final Integer NATION_TYPE_DISTRICT = 1;
+    public static final Integer NATION_TYPE_COMMUNE = 2;
+
+    public static final Integer MALE_GENDER = 0;
+    public static final Integer FEMALE_GENDER = 1;
+    public static final Integer OTHER_GENDER = 2;
 
     public static final Integer GROUP_KIND_ADMIN = 1;
     public static final Integer GROUP_KIND_MANAGER = 2;
