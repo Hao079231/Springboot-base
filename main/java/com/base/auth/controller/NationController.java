@@ -1,5 +1,6 @@
 package com.base.auth.controller;
 
+import com.base.auth.constant.UserBaseConstant;
 import com.base.auth.dto.ApiMessageDto;
 import com.base.auth.dto.ResponseListDto;
 import com.base.auth.dto.nation.NationDto;
@@ -9,8 +10,10 @@ import com.base.auth.form.nation.UpdateNationForm;
 import com.base.auth.mapper.NationMapper;
 import com.base.auth.model.Nation;
 import com.base.auth.model.criteria.NationCriteria;
+import com.base.auth.repository.CustomerRepository;
 import com.base.auth.repository.NationRepository;
 import java.util.List;
+import javax.transaction.Transactional;
 import javax.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +39,9 @@ import org.springframework.web.bind.annotation.RestController;
 public class NationController extends ABasicController{
   @Autowired
   private NationRepository nationRepository;
+
+  @Autowired
+  private CustomerRepository customerRepository;
 
   @Autowired
   NationMapper nationMapper;
@@ -86,11 +92,13 @@ public class NationController extends ABasicController{
     ApiMessageDto<String> apiMessageDto = new ApiMessageDto<>();
     Nation nation = nationRepository.findById(request.getId()).orElseThrow(()
     -> new NotFoundException("Nation id not found"));
-    Nation existingNation = nationRepository.findFirstByName(request.getName());
-    if (existingNation != null && !existingNation.getId().equals(request.getId())){
-      apiMessageDto.setResult(false);
-      apiMessageDto.setMessage("Nation name already exists with a different ID!");
-      return apiMessageDto;
+    if (!nation.getName().equals(request.getName())){
+      Nation existingNation = nationRepository.findFirstByName(request.getName());
+      if (existingNation != null){
+        apiMessageDto.setResult(false);
+        apiMessageDto.setMessage("Nation name already exists with a different ID!");
+        return apiMessageDto;
+      }
     }
     nationMapper.mappingForUpdateNation(request, nation);
     nationRepository.save(nation);
@@ -98,12 +106,18 @@ public class NationController extends ABasicController{
     return apiMessageDto;
   }
 
+  @Transactional
   @DeleteMapping(value = "/delete/{id}", produces= MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("hasRole('NA_D')")
   public ApiMessageDto<String> delete(@PathVariable Long id){
     Nation nation = nationRepository.findById(id).orElseThrow(()
     -> new NotFoundException("Nation id not found"));
     ApiMessageDto<String> apiMessageDto = new ApiMessageDto<>();
+    if (customerRepository.existsByProvinceOrDistrictOrCommune(nation.getId())){
+      apiMessageDto.setResult(false);
+      apiMessageDto.setMessage("Cannot delete nation because there are still customer living");
+      return apiMessageDto;
+    }
     nationRepository.deleteById(id);
     apiMessageDto.setMessage("Delete nation success");
     return apiMessageDto;

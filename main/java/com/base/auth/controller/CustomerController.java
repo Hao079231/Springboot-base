@@ -1,5 +1,6 @@
 package com.base.auth.controller;
 
+import com.base.auth.constant.UserBaseConstant;
 import com.base.auth.dto.ApiMessageDto;
 import com.base.auth.dto.ResponseListDto;
 import com.base.auth.dto.customer.CustomerDto;
@@ -18,6 +19,7 @@ import com.base.auth.repository.GroupRepository;
 import com.base.auth.repository.NationRepository;
 import java.util.Date;
 import java.util.List;
+import javax.transaction.Transactional;
 import javax.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,21 +73,22 @@ public class CustomerController {
       return apiMessageDto;
     }
 
-    Group group = groupRepository.findById(request.getGroupId()).orElseThrow(()
-    -> new NotFoundException("Group id not found"));
+    Group group = groupRepository.findFirstByKind(UserBaseConstant.GROUP_KIND_CUSTOMER);
 
-    Nation provinceNation = nationRepository.findByIdAndType(request.getProvinceId(), 0).orElseThrow(()
+    Nation provinceNation = nationRepository.findByIdAndType(request.getProvinceId(),
+        UserBaseConstant.NATION_TYPE_PROVINCE).orElseThrow(()
     -> new NotFoundException("Province id not found"));
 
-    Nation districtNation = nationRepository.findByIdAndType(request.getDistrictId(), 1).orElseThrow(()
+    Nation districtNation = nationRepository.findByIdAndType(request.getDistrictId(), UserBaseConstant.NATION_TYPE_DISTRICT).orElseThrow(()
         -> new NotFoundException("District id not found"));
 
-    Nation communeNation = nationRepository.findByIdAndType(request.getCommuneId(), 2).orElseThrow(()
+    Nation communeNation = nationRepository.findByIdAndType(request.getCommuneId(), UserBaseConstant.NATION_TYPE_COMMUNE).orElseThrow(()
         -> new NotFoundException("Commune id not found"));
     Customer customer = customerMapper.fromCreateToCustomer(request);
     customer.getAccount().setPassword(passwordEncoder.encode(request.getPassword()));
     customer.getAccount().setLastLogin(new Date());
     customer.getAccount().setGroup(group);
+    customer.getAccount().setKind(UserBaseConstant.USER_KIND_USER);
     customer.setProvince(provinceNation);
     customer.setDistrict(districtNation);
     customer.setCommune(communeNation);
@@ -123,28 +126,29 @@ public class CustomerController {
     ApiMessageDto<String> apiMessageDto = new ApiMessageDto<>();
     Customer customer = customerRepository.findById(request.getCustomerId()).orElseThrow(()
     -> new NotFoundException("Customer id not found"));
-    Account account = accountRepository.findAccountByUsername(request.getUsername());
-    if (account != null && !account.getId().equals(customer.getAccount().getId())){
-      apiMessageDto.setResult(false);
-      apiMessageDto.setMessage("Username already exists with a different ID!");
-      return apiMessageDto;
+    if (!customer.getAccount().getUsername().equals(request.getUsername())){
+      Account account = accountRepository.findAccountByUsername(request.getUsername());
+      if (account != null){
+        apiMessageDto.setResult(false);
+        apiMessageDto.setMessage("Username already exists with a different ID!");
+        return apiMessageDto;
+      }
     }
+    Group group = groupRepository.findFirstByKind(UserBaseConstant.GROUP_KIND_CUSTOMER);
 
-    Group group = groupRepository.findById(request.getGroupId()).orElseThrow(()
-        -> new NotFoundException("Group id not found"));
-
-    Nation provinceNation = nationRepository.findByIdAndType(request.getProvinceId(), 0).orElseThrow(()
+    Nation provinceNation = nationRepository.findByIdAndType(request.getProvinceId(), UserBaseConstant.NATION_TYPE_PROVINCE).orElseThrow(()
         -> new NotFoundException("Province id not found"));
 
-    Nation districtNation = nationRepository.findByIdAndType(request.getDistrictId(), 1).orElseThrow(()
+    Nation districtNation = nationRepository.findByIdAndType(request.getDistrictId(), UserBaseConstant.NATION_TYPE_DISTRICT).orElseThrow(()
         -> new NotFoundException("District id not found"));
 
-    Nation communeNation = nationRepository.findByIdAndType(request.getCommuneId(), 2).orElseThrow(()
+    Nation communeNation = nationRepository.findByIdAndType(request.getCommuneId(), UserBaseConstant.NATION_TYPE_COMMUNE).orElseThrow(()
         -> new NotFoundException("Commune id not found"));
     customerMapper.mappingForUpdateCustomer(request, customer);
     customer.getAccount().setPassword(passwordEncoder.encode(request.getPassword()));
     customer.getAccount().setLastLogin(new Date());
     customer.getAccount().setGroup(group);
+    customer.getAccount().setKind(UserBaseConstant.USER_KIND_USER);
     customer.setProvince(provinceNation);
     customer.setDistrict(districtNation);
     customer.setCommune(communeNation);
@@ -153,6 +157,7 @@ public class CustomerController {
     return apiMessageDto;
   }
 
+  @Transactional
   @DeleteMapping(value = "/delete/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("hasRole('C_D')")
   public ApiMessageDto<String> deleteCustomer(@PathVariable Long id) {
@@ -161,7 +166,8 @@ public class CustomerController {
     Customer customer = customerRepository.findById(id)
         .orElseThrow(() -> new NotFoundException("Customer id not found"));
 
-    customerRepository.delete(customer);
+    customerRepository.deleteCustomerById(id);
+    accountRepository.deleteAccountById(id);
 
     apiMessageDto.setMessage("Delete customer success");
     return apiMessageDto;

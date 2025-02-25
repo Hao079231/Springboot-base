@@ -80,12 +80,13 @@ public class CategoryController extends ABasicController {
     ApiMessageDto<String> apiMessageDto = new ApiMessageDto<>();
     Category category = categoryRepository.findById(request.getCategoryId()).orElseThrow(() ->
         new NotFoundException("Category id not found"));
-
-    Category existingCategory = categoryRepository.findFirstByName(request.getName());
-    if (existingCategory != null && !existingCategory.getId().equals(request.getCategoryId())) {
-      apiMessageDto.setResult(false);
-      apiMessageDto.setMessage("Category name already exists with a different ID!");
-      return apiMessageDto;
+    if (!category.getName().equals(request.getName())){
+      Category existingCategory = categoryRepository.findFirstByName(request.getName());
+      if (existingCategory != null) {
+        apiMessageDto.setResult(false);
+        apiMessageDto.setMessage("Category name already exists with a different ID!");
+        return apiMessageDto;
+      }
     }
 
     categoryMapper.mappingForUpdateServiceCategory(request, category);

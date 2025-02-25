@@ -28,16 +28,10 @@ public class UpdateCustomerForm {
   @NotEmpty(message = "password cant not be null")
   @ApiModelProperty(name = "password", required = true)
   private String password;
-  @NotNull(message = "kind cant not be null")
-  @ApiModelProperty(name = "kind", required = true)
-  private Integer kind;
   @NotEmpty(message = "fullName cant not be null")
   @ApiModelProperty(name = "fullName",example = "Trinh Trung Hao",required = true)
   private String fullName;
   private String avatarPath;
-  @NotNull(message = "groupId cant not be null")
-  @ApiModelProperty(name = "groupId", required = true)
-  private Long groupId;
   @Past(message = "birthday must be a past day.")
   @ApiModelProperty(name = "birthday", example = "22-12-2012", required = true)
   @JsonFormat(pattern = "dd-MM-yyyy")
