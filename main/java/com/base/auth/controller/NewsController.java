@@ -37,7 +37,7 @@ public class NewsController {
   private CategoryRepository categoryRepository;
 
   @PostMapping(value = "/create", produces= MediaType.APPLICATION_JSON_VALUE)
-  @PreAuthorize("hasRole('S_C')")
+  @PreAuthorize("hasRole('N_C')")
   public ApiMessageDto<String> create(@Valid @RequestBody CreateNewsForm request, BindingResult bindingResult){
     ApiMessageDto<String> apiMessageDto = new ApiMessageDto<>();
     News news = newsRepository.findFirstByTitle(request.getTitle());
@@ -57,7 +57,7 @@ public class NewsController {
   }
 
   @GetMapping(value = "/list", produces= MediaType.APPLICATION_JSON_VALUE)
-  @PreAuthorize("hasRole('S_L')")
+  @PreAuthorize("hasRole('N_L')")
   public ApiMessageDto<ResponseListDto<List<NewsAutoCompleteDto>>> getList(NewsCriteria request, Pageable pageable){
     ApiMessageDto<ResponseListDto<List<NewsAutoCompleteDto>>> apiMessageDto = new ApiMessageDto<>();
     Page<News> news = newsRepository.findAll(request.getSpecification(), pageable);
@@ -69,7 +69,7 @@ public class NewsController {
   }
 
   @GetMapping(value = "/get/{id}", produces= MediaType.APPLICATION_JSON_VALUE)
-  @PreAuthorize("hasRole('S_V')")
+  @PreAuthorize("hasRole('N_V')")
   public ApiMessageDto<NewsAutoCompleteDto> getNewsById(@PathVariable("id") Long id){
     ApiMessageDto<NewsAutoCompleteDto> apiMessageDto = new ApiMessageDto<>();
     News news = newsRepository.findById(id).orElseThrow(() ->
@@ -80,7 +80,7 @@ public class NewsController {
   }
 
   @PutMapping(value = "/update", produces= MediaType.APPLICATION_JSON_VALUE )
-  @PreAuthorize("hasRole('S_U')")
+  @PreAuthorize("hasRole('N_U')")
   public ApiMessageDto<String> updateNews(@Valid @RequestBody UpdateNewsForm request, BindingResult bindingResult){
     ApiMessageDto<String> apiMessageDto = new ApiMessageDto<>();
     News news = newsRepository.findById(request.getId()).orElseThrow(() ->
@@ -104,7 +104,7 @@ public class NewsController {
   }
 
   @DeleteMapping("/delete/{id}")
-  @PreAuthorize("hasRole('S_D')")
+  @PreAuthorize("hasRole('N_D')")
   public ApiMessageDto<String> deleteNews(@PathVariable("id") Long id){
     ApiMessageDto<String> apiMessageDto = new ApiMessageDto<>();
     News news = newsRepository.findById(id).orElseThrow(() ->

@@ -9,10 +9,8 @@ import lombok.Data;
 public class NationAdminDto extends ABasicAdminDto {
     @ApiModelProperty(name = "name")
     private String name;
-    @ApiModelProperty(name = "postCode")
-    private String postCode;
-    @ApiModelProperty(name = "kind")
-    private Integer kind;
-    @ApiModelProperty(name = "parent")
-    private NationDto parent;
+    @ApiModelProperty(name = "description")
+    private String description;
+    @ApiModelProperty(name = "type")
+    private Integer type;
 }
