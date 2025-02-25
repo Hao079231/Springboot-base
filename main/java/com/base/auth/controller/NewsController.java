@@ -85,12 +85,13 @@ public class NewsController {
     ApiMessageDto<String> apiMessageDto = new ApiMessageDto<>();
     News news = newsRepository.findById(request.getId()).orElseThrow(() ->
         new NotFoundException("News id not found"));
-
-    News existingNews = newsRepository.findFirstByTitle(request.getTitle());
-    if (existingNews != null && !existingNews.getId().equals(request.getId())){
-      apiMessageDto.setResult(false);
-      apiMessageDto.setMessage("News title already exists with a different ID!");
-      return apiMessageDto;
+    if (!news.getTitle().equals(request.getTitle())){
+      News existingNews = newsRepository.findFirstByTitle(request.getTitle());
+      if (existingNews != null && !existingNews.getId().equals(request.getId())){
+        apiMessageDto.setResult(false);
+        apiMessageDto.setMessage("News title already exists with a different ID!");
+        return apiMessageDto;
+      }
     }
 
     Category category = categoryRepository.findById(request.getCategoryId()).orElseThrow(() ->

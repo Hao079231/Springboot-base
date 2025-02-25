@@ -1,5 +1,6 @@
 package com.base.auth.model;
 
+import com.base.auth.component.CustomerListener;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.Date;
 import javax.persistence.CascadeType;
@@ -18,7 +19,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Entity
 @Table(name = "db_user_base_customer")
-@EntityListeners(AuditingEntityListener.class)
+@EntityListeners({AuditingEntityListener.class, CustomerListener.class})
 @Getter
 @Setter
 public class Customer extends Auditable<String>{
@@ -26,7 +27,7 @@ public class Customer extends Auditable<String>{
   @Id
   private Long id;
 
-  @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+  @OneToOne
   @MapsId
   @JoinColumn(name = "id")
   private Account account;
