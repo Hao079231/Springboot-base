@@ -94,7 +94,7 @@ public class NationController extends ABasicController{
     -> new NotFoundException("Nation id not found"));
     if (!nation.getName().equals(request.getName())){
       Nation existingNation = nationRepository.findFirstByName(request.getName());
-      if (existingNation != null && !existingNation.getId().equals(request.getId())){
+      if (existingNation != null){
         apiMessageDto.setResult(false);
         apiMessageDto.setMessage("Nation name already exists with a different ID!");
         return apiMessageDto;

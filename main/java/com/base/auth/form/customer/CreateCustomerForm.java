@@ -25,9 +25,6 @@ public class CreateCustomerForm {
   @NotEmpty(message = "password cant not be null")
   @ApiModelProperty(name = "password", required = true)
   private String password;
-  @NotNull(message = "kind cant not be null")
-  @ApiModelProperty(name = "kind", required = true)
-  private Integer kind;
   @NotEmpty(message = "fullName cant not be null")
   @ApiModelProperty(name = "fullName",example = "Trinh Trung Hao",required = true)
   private String fullName;

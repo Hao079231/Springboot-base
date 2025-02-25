@@ -82,7 +82,7 @@ public class CategoryController extends ABasicController {
         new NotFoundException("Category id not found"));
     if (!category.getName().equals(request.getName())){
       Category existingCategory = categoryRepository.findFirstByName(request.getName());
-      if (existingCategory != null && !existingCategory.getId().equals(request.getCategoryId())) {
+      if (existingCategory != null) {
         apiMessageDto.setResult(false);
         apiMessageDto.setMessage("Category name already exists with a different ID!");
         return apiMessageDto;

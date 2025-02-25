@@ -73,6 +73,8 @@ public class CustomerController {
       return apiMessageDto;
     }
 
+    Group group = groupRepository.findFirstByKind(UserBaseConstant.GROUP_KIND_CUSTOMER);
+
     Nation provinceNation = nationRepository.findByIdAndType(request.getProvinceId(),
         UserBaseConstant.NATION_TYPE_PROVINCE).orElseThrow(()
     -> new NotFoundException("Province id not found"));
@@ -85,6 +87,8 @@ public class CustomerController {
     Customer customer = customerMapper.fromCreateToCustomer(request);
     customer.getAccount().setPassword(passwordEncoder.encode(request.getPassword()));
     customer.getAccount().setLastLogin(new Date());
+    customer.getAccount().setGroup(group);
+    customer.getAccount().setKind(UserBaseConstant.USER_KIND_USER);
     customer.setProvince(provinceNation);
     customer.setDistrict(districtNation);
     customer.setCommune(communeNation);
@@ -124,12 +128,13 @@ public class CustomerController {
     -> new NotFoundException("Customer id not found"));
     if (!customer.getAccount().getUsername().equals(request.getUsername())){
       Account account = accountRepository.findAccountByUsername(request.getUsername());
-      if (account != null && !account.getId().equals(customer.getAccount().getId())){
+      if (account != null){
         apiMessageDto.setResult(false);
         apiMessageDto.setMessage("Username already exists with a different ID!");
         return apiMessageDto;
       }
     }
+    Group group = groupRepository.findFirstByKind(UserBaseConstant.GROUP_KIND_CUSTOMER);
 
     Nation provinceNation = nationRepository.findByIdAndType(request.getProvinceId(), UserBaseConstant.NATION_TYPE_PROVINCE).orElseThrow(()
         -> new NotFoundException("Province id not found"));
@@ -142,6 +147,8 @@ public class CustomerController {
     customerMapper.mappingForUpdateCustomer(request, customer);
     customer.getAccount().setPassword(passwordEncoder.encode(request.getPassword()));
     customer.getAccount().setLastLogin(new Date());
+    customer.getAccount().setGroup(group);
+    customer.getAccount().setKind(UserBaseConstant.USER_KIND_USER);
     customer.setProvince(provinceNation);
     customer.setDistrict(districtNation);
     customer.setCommune(communeNation);
